@@ -1,5 +1,7 @@
 include_recipe 'apt'
 
+directory "/etc/update-motd.d"
+
 cookbook_file '/etc/update-motd.d/50-landscape-sysinfo' do
   owner 'root'
   group 'root'
