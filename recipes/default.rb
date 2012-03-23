@@ -7,7 +7,7 @@ cookbook_file '/etc/update-motd.d/50-landscape-sysinfo' do
 end
 
 apt_repository "librato" do
-  uri "http://apt.librato.com/ubuntu"
+  uri "http://apt.librato.com/#{node[:platform]}"
   distribution node['lsb']['codename']
   components [node[:silverline][:component]]
   key "http://apt.librato.com/packages.librato.key"
