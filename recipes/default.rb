@@ -20,11 +20,6 @@ apt_package "librato-silverline" do
   action :install
 end
 
-service 'silverline' do
-  provider Chef::Provider::Service::Upstart
-  action [:enable, :start]
-end
-
 template "/etc/load_manager/lmd.conf" do
   source 'lmd.conf.erb'
   owner 'root'
@@ -35,8 +30,22 @@ template "/etc/load_manager/lmd.conf" do
               :server_id_cmd => node[:silverline][:server_id_cmd],
               :template_id => node[:silverline][:template_id]
             })
-  notifies :restart, resources(:service => "silverline")
   action :create
+end
+
+case node[:platform]
+  when "ubuntu"
+    service 'silverline' do
+      provider Chef::Provider::Service::Upstart
+      action [:enable, :start]
+      subscribes :restart, resources(:template => "/etc/load_manager/lmd.conf")
+    end
+  when "debian"
+    execute "start silverline agent" do
+      command "telinit q"
+      action :nothing
+      subscribes :run, resources(:template => "/etc/load_manager/lmd.conf")
+    end
 end
 
 template "/etc/load_manager/lmc.conf" do
